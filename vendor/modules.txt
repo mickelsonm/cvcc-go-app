@@ -1,0 +1,8 @@
+# github.com/go-sql-driver/mysql v1.4.0
+github.com/go-sql-driver/mysql
+# github.com/google/uuid v1.0.0
+github.com/google/uuid
+# github.com/pkg/errors v0.8.0
+github.com/pkg/errors
+# google.golang.org/appengine v1.2.0
+google.golang.org/appengine/cloudsql
