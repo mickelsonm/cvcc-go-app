@@ -4,11 +4,12 @@ ENV GOPATH=/go/src
 WORKDIR /go/src/cvcc
 COPY . .
 
-RUN go build -mod=vendor -o /cvcc
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -mod=vendor -o /cvcc
 
 FROM alpine
 
-WORKDIR /app
+WORKDIR /app/
 
-COPY --from=builder /cvcc /app/cvcc
-ENTRYPOINT ./cvcc
+COPY --from=builder /cvcc .
+RUN ls
+CMD [ "./cvcc" ]
