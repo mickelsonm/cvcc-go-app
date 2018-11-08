@@ -26,6 +26,7 @@ Start a MySQL Docker container
   -e MYSQL_DATABASE=${MYSQL_DB} \
   -v ~/tmp/mysql:/var/lib/mysql \
   -p 3307:3306 \
+  --rm \
   --name cvcc-mysql \
   mysql:5.7
 ```
@@ -57,6 +58,7 @@ Run the Docker Image
 > docker \
     run \
     -p 8080:8080 \
+    -d \
     -e MYSQL_USER=${MYSQL_USER} \
     -e MYSQL_PASS=${MYSQL_PASS} \
     -e MYSQL_HOST=mysql \
@@ -64,6 +66,7 @@ Run the Docker Image
     -e MYSQL_DB=${MYSQL_DB} \
     --name cvcc-go \
     --link cvcc-mysql:mysql \
+    --rm \
     cvcc-go:production
 ```
 
