@@ -39,7 +39,13 @@ Start the Application
 Build the Docker Image
 
 ```
-> docker build -t cvcc-go-app .
+> docker build -t cvcc-go:production .
+```
+
+Notice the difference in image size
+
+```
+> docker images | grep cvcc
 ```
 
 Run the Docker Image
@@ -55,7 +61,7 @@ Run the Docker Image
     -e MYSQL_DB=${MYSQL_DB} \
     --name cvcc-go \
     --link cvcc-mysql:mysql \
-    cvcc-go
+    cvcc-go:production
 ```
 
 Profit
