@@ -3,6 +3,8 @@ package quotes
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -22,12 +24,23 @@ const (
 	`
 )
 
+var (
+	sqlUser = os.Getenv("MYSQL_USER")
+	sqlPwd  = os.Getenv("MYSQL_PASS")
+	sqlHost = os.Getenv("MYSQL_HOST")
+	sqlPort = os.Getenv("MYSQL_PORT")
+	sqlDb   = os.Getenv("MYSQL_DB")
+)
+
 type Service struct {
 	db *sql.DB
 }
 
 func NewService() (Interactor, error) {
-	db, err := sql.Open("mysql", "cvcc-user:cvcc-pass@tcp(127.0.0.1:3307)/sample")
+	db, err := sql.Open(
+		"mysql",
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", sqlUser, sqlPwd, sqlHost, sqlPort, sqlDb),
+	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create SQL connection")
 	}
