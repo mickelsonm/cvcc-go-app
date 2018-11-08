@@ -8,23 +8,25 @@ Export environment variables
 ```
 > export MYSQL_USER=cvcc-user \
     MYSQL_PASS=cvcc-pass \
-    MYSQL_HOST=127.0.0.1 \
-    MYSQL_PORT=3307 \
-    MYSQL_DB=sample
+    MYSQL_DB=sample \
+    MYSQL_HOST=localhost \
+    MYSQL_PORT=3307
 ```
 
 Start a MySQL Docker container
 
 ```
+> mkdir -p ~/tmp/mysql
 > docker \
   run \
-  --detach \
-  --env MYSQL_ROOT_PASSWORD=${MYSQL_PASS} \
-  --env MYSQL_USER=${MYSQL_USER} \
-  --env MYSQL_PASSWORD=${MYSQL_PASS} \
-  --env MYSQL_DATABASE=${MYSQL_DB} \
+  -d \
+  -e MYSQL_ROOT_PASSWORD=${MYSQL_PASS} \
+  -e MYSQL_USER=${MYSQL_USER} \
+  -e MYSQL_PASSWORD=${MYSQL_PASS} \
+  -e MYSQL_DATABASE=${MYSQL_DB} \
+  -v ~/tmp/mysql:/var/lib/mysql \
+  -p 3307:3306 \
   --name cvcc-mysql \
-  --publish 3307:3306 \
   mysql:5.7
 ```
 
@@ -32,6 +34,28 @@ Start the Application
 
 ```
 > go run main.go
+```
+
+Build the Docker Image
+
+```
+> docker build -t cvcc-go-app .
+```
+
+Run the Docker Image
+
+```
+> docker \
+    run \
+    -p 8080:8080 \
+    -e MYSQL_USER=${MYSQL_USER} \
+    -e MYSQL_PASS=${MYSQL_PASS} \
+    -e MYSQL_HOST=mysql \
+    -e MYSQL_PORT=3306 \
+    -e MYSQL_DB=${MYSQL_DB} \
+    --name cvcc-go \
+    --link cvcc-mysql:mysql \
+    cvcc-go
 ```
 
 Profit
