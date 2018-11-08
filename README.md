@@ -3,38 +3,11 @@ Simple WebApp for Demonstrating Kubernetes Deployment
 
 #### Running the application
 
-Export environment variables
+Start a MySQL Kubernetes Deployment and Service
 
 ```
-> export MYSQL_USER=cvcc-user \
-    MYSQL_PASS=cvcc-pass \
-    MYSQL_DB=sample \
-    MYSQL_HOST=localhost \
-    MYSQL_PORT=3307
-```
-
-Start a MySQL Docker container
-
-```
-> mkdir -p ~/tmp/mysql
-> docker \
-  run \
-  -d \
-  -e MYSQL_ROOT_PASSWORD=${MYSQL_PASS} \
-  -e MYSQL_USER=${MYSQL_USER} \
-  -e MYSQL_PASSWORD=${MYSQL_PASS} \
-  -e MYSQL_DATABASE=${MYSQL_DB} \
-  -v ~/tmp/mysql:/var/lib/mysql \
-  -p 3307:3306 \
-  --rm \
-  --name cvcc-mysql \
-  mysql:5.7
-```
-
-Start the Application
-
-```
-> go run main.go
+> kubectl create -f mysql.deployment.json
+> kubectl create -f mysql.service.json
 ```
 
 Build the Docker Image
@@ -46,28 +19,11 @@ cvcc-go         production          cb82fc78c390        15 minutes ago      13.9
 cvcc-go         latest              0fecbc3178e9        17 minutes ago      796MB
 ```
 
-Notice the difference in image size
+Start the applications Kubernetes Deployment and Service
 
 ```
-> docker images | grep cvcc
-```
-
-Run the Docker Image
-
-```
-> docker \
-    run \
-    -p 8080:8080 \
-    -d \
-    -e MYSQL_USER=${MYSQL_USER} \
-    -e MYSQL_PASS=${MYSQL_PASS} \
-    -e MYSQL_HOST=mysql \
-    -e MYSQL_PORT=3306 \
-    -e MYSQL_DB=${MYSQL_DB} \
-    --name cvcc-go \
-    --link cvcc-mysql:mysql \
-    --rm \
-    cvcc-go:production
+> kubectl create -f app.deployment.json
+> kubectl create -f app.service.json
 ```
 
 Profit
