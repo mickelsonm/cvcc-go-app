@@ -40,6 +40,9 @@ Build the Docker Image
 
 ```
 > docker build -t cvcc-go:production .
+REPOSITORY      TAG                 IMAGE ID            CREATED             SIZE
+cvcc-go         production          cb82fc78c390        15 minutes ago      13.9MB
+cvcc-go         latest              0fecbc3178e9        17 minutes ago      796MB
 ```
 
 Notice the difference in image size
