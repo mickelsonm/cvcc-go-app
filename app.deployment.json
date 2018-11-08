@@ -1,0 +1,57 @@
+{
+	"apiVersion": "extensions/v1beta1",
+	"kind": "Deployment",
+	"metadata": {
+		"name": "cvcc-go"
+	},
+	"spec": {
+		"replicas": 1,
+		"template": {
+			"metadata": {
+				"labels": {
+					"app": "cvcc-go"
+				}
+			},
+			"spec": {
+				"containers": [{
+					"name": "cvcc-go",
+					"image": "cvcc-go:production",
+					"imagePullPolicy": "Never",
+					"resources": {
+						"requests": {
+							"cpu": 0.05
+						},
+						"limits": {
+							"cpu": 0.05
+						}
+					},
+					"ports": [{
+						"containerPort": 8080
+					}],
+					"env": [
+						{
+							"name": "MYSQL_USER",
+							"value": "cvcc-user"
+                        },
+                        {
+                        	"name": "MYSQL_PASS",
+                        	"value": "cvcc-pass"
+                        },
+                        {
+                        	"name": "MYSQL_DB",
+                        	"value": "sample"
+                        },
+                        {
+                        	"name": "MYSQL_HOST",
+                        	"value": "mysql"
+                        },
+                        {
+                        	"name": "MYSQL_PORT",
+                        	"value": "3307"
+                        }
+					]
+				}]
+			}
+		}
+	}
+}

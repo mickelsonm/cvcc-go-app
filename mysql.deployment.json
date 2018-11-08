@@ -1,0 +1,57 @@
+{
+	"apiVersion": "extensions/v1beta1",
+	"kind": "Deployment",
+	"metadata": {
+		"name": "mysql"
+	},
+	"spec": {
+		"replicas": 1,
+		"template": {
+			"metadata": {
+				"labels": {
+					"app": "mysql"
+				}
+			},
+			"spec": {
+				"containers": [{
+					"name": "mysql",
+					"image": "mysql:5.7",
+					"imagePullPolicy": "Always",
+					"resources": {
+						"requests": {
+							"cpu": 0.05
+						},
+						"limits": {
+							"cpu": 0.05
+						}
+					},
+					"ports": [{
+                        "containerPort": 3306
+					}],
+					"env": [
+						{
+							"name": "MYSQL_ROOT_PASSWORD",
+							"value": "cvcc-pass"
+                        },
+                        {
+                        	"name": "MYSQL_PASSWORD",
+                        	"value": "cvcc-pass"
+						},
+						{
+							"name": "MYSQL_ROOT_HOST",
+							"value": "%"
+						},
+                        {
+                        	"name": "MYSQL_USER",
+                        	"value": "cvcc-user"
+                        },
+                        {
+                        	"name": "MYSQL_DATABASE",
+                        	"value": "sample"
+                        }
+					]
+				}]
+			}
+		}
+	}
+}
