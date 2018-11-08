@@ -7,6 +7,5 @@ COPY . .
 RUN go build -mod=vendor -o cvcc
 
 EXPOSE 8080
-RUN ls
 
 CMD ["./cvcc"]
