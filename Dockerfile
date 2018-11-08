@@ -1,12 +1,14 @@
-FROM golang:1.11
+FROM golang:1.11 as builder
 
 ENV GOPATH=/go/src
 WORKDIR /go/src/cvcc
 COPY . .
 
-RUN go build -mod=vendor -o cvcc
+RUN go build -mod=vendor -o /cvcc
 
-EXPOSE 8080
-RUN ls
+FROM alpine
 
-CMD ["./cvcc"]
+WORKDIR /app
+
+COPY --from=builder /cvcc /app/cvcc
+ENTRYPOINT ./cvcc
