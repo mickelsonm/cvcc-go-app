@@ -77,6 +77,26 @@ func (s *Service) List(ctx context.Context) ([]*Quote, error) {
 	return results, nil
 }
 
+func (s *Service) Get(ctx context.Context, id string) (*Quote, error) {
+
+	stmt, err := s.db.PrepareContext(ctx, "select id, author, quote, created from quotes where id=?")
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to prepare query")
+	}
+
+	row := stmt.QueryRowContext(ctx, id)
+	if row == nil {
+		return nil, nil
+	}
+
+	quote := &Quote{}
+	if err := row.Scan(&quote.ID, &quote.Author, &quote.Quote, &quote.Created); err != nil {
+		return nil, errors.Wrap(err, "failed to read row from database")
+	}
+
+	return quote, nil
+}
+
 func (s *Service) Put(ctx context.Context, q *Quote) (*Quote, error) {
 	ins, err := s.db.Prepare("INSERT INTO quotes VALUES( ?, ?, ?, ? )") // ? = placeholder
 	if err != nil {
@@ -92,4 +112,34 @@ func (s *Service) Put(ctx context.Context, q *Quote) (*Quote, error) {
 	}
 
 	return q, nil
+}
+
+func (s *Service) Update(ctx context.Context, q *Quote) (*Quote, error) {
+	upd, err := s.db.Prepare("update quotes set author=?, quote=? where id=?") // ? = placeholder
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to prepare update statement")
+	}
+	defer upd.Close() // Close the statement when we leave main() / the program terminates
+
+	_, err = upd.Exec(q.Author, q.Quote, q.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to update quote")
+	}
+
+	return q, nil
+}
+
+func (s *Service) Delete(ctx context.Context, id string) error {
+	del, err := s.db.Prepare("delete from quotes where id=?") // ? = placeholder
+	if err != nil {
+		return errors.Wrap(err, "failed to prepare delete statement")
+	}
+	defer del.Close() // Close the statement when we leave main() / the program terminates
+
+	_, err = del.Exec(id)
+	if err != nil {
+		return errors.Wrap(err, "failed to delete quote")
+	}
+
+	return nil
 }

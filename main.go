@@ -22,6 +22,7 @@ func main() {
 
 	http.HandleFunc("/put", mux.Put)
 	http.HandleFunc("/add", mux.Add)
+	http.HandleFunc("/api", mux.API)
 	http.HandleFunc("/", mux.Index)
 
 	port := ":8080"
