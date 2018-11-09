@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"encoding/json"
 	"html/template"
 	"net/http"
 
@@ -51,6 +52,7 @@ type Router interface {
 	Index(http.ResponseWriter, *http.Request)
 	Add(http.ResponseWriter, *http.Request)
 	Put(http.ResponseWriter, *http.Request)
+	API(http.ResponseWriter, *http.Request)
 }
 
 type BasicRouter struct {
@@ -129,4 +131,115 @@ func (b *BasicRouter) Put(w http.ResponseWriter, req *http.Request) {
 	}
 
 	http.Redirect(w, req, "/", http.StatusFound)
+}
+
+func (b *BasicRouter) API(w http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case http.MethodPut:
+		b.apiCreate(w, req)
+		return
+	case http.MethodPost:
+		b.apiUpdate(w, req)
+		return
+	case http.MethodDelete:
+		b.apiDelete(w, req)
+		return
+	}
+
+	id := req.URL.Query().Get("id")
+
+	var res interface{}
+	var err error
+	switch id {
+	case "":
+		res, err = b.quotes.List(context.Background())
+	default:
+		res, err = b.quotes.Get(context.Background(), id)
+	}
+
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, DELETE, PATCH, POST")
+	w.Header().Set("Content-Type", "application/json")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+}
+
+func (b *BasicRouter) apiCreate(w http.ResponseWriter, req *http.Request) {
+	var q quotes.Quote
+	err := json.NewDecoder(req.Body).Decode(&q)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	res, err := b.quotes.Put(context.Background(), &q)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, DELETE, PATCH, POST")
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+}
+
+func (b *BasicRouter) apiUpdate(w http.ResponseWriter, req *http.Request) {
+	var q quotes.Quote
+	err := json.NewDecoder(req.Body).Decode(&q)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	res, err := b.quotes.Update(context.Background(), &q)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, DELETE, PATCH, POST")
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+}
+
+func (b *BasicRouter) apiDelete(w http.ResponseWriter, req *http.Request) {
+	id := req.URL.Query().Get("id")
+
+	if err := b.quotes.Delete(context.Background(), id); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, PUT, DELETE, PATCH, POST")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }

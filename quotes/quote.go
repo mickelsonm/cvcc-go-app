@@ -11,5 +11,8 @@ type Quote struct {
 
 type Interactor interface {
 	List(context.Context) ([]*Quote, error)
+	Get(context.Context, string) (*Quote, error)
 	Put(context.Context, *Quote) (*Quote, error)
+	Update(context.Context, *Quote) (*Quote, error)
+	Delete(context.Context, string) error
 }
